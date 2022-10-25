@@ -17,7 +17,8 @@ class MyPath(object):
     """
     @staticmethod
     def db_root_dir(database=''):
-        db_root = '/home/liufangfang/szf/Pycharm_Projects/多任务研究/Multi-Task-Learning-PyTorch-master/Multi-Task-Learning-PyTorch-master/dataset'
+        # db_root = '/home/liufangfang/szf/workspace/Multitask_Semantic_Communication/Architecture_Fusion/Multi_Task_Learning_PyTorch_v2/dataset'
+        db_root = '/home/liufangfang/szf/workspace/多任务研究/Multi-Task-Learning-PyTorch-master/Multi-Task-Learning-PyTorch-master/dataset'
         db_names = {'PASCAL_MT', 'NYUD_MT'}
 
         if database in db_names:
