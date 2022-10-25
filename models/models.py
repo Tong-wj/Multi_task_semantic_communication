@@ -9,16 +9,26 @@ import torch.nn.functional as F
 
 class SingleTaskModel(nn.Module):
     """ Single-task baseline model with encoder + decoder """
-    def __init__(self, backbone: nn.Module, decoder: nn.Module, task: str):
+    def __init__(self, backbone: nn.Module, dynamic_jscc: nn.Module, decoder: nn.Module, task: str):
         super(SingleTaskModel, self).__init__()
         self.backbone = backbone
+        self.dynamic_jscc = dynamic_jscc
         self.decoder = decoder 
         self.task = task
 
+
     def forward(self, x):
+
         out_size = x.size()[2:]
-        out = self.decoder(self.backbone(x))
-        return {self.task: F.interpolate(out, out_size, mode='bilinear')}
+        out_backbone = self.backbone(x)
+        self.dynamic_jscc.set_input(out_backbone)
+        out_dynamic_jscc = self.dynamic_jscc()
+        if True:
+            loss_dynamic_jscc, cpp = self.dynamic_jscc.backward_G()
+        else:
+            loss_dynamic_jscc, cpp = 0, 0
+        out = self.decoder(out_dynamic_jscc)
+        return {self.task: F.interpolate(out, out_size, mode='bilinear'), 'dynamic_jscc_loss': loss_dynamic_jscc, 'cpp': cpp}
 
 
 class MultiTaskModel(nn.Module):

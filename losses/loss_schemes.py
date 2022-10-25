@@ -16,7 +16,7 @@ class SingleTaskLoss(nn.Module):
     
     def forward(self, pred, gt):
         out = {self.task: self.loss_ft(pred[self.task], gt[self.task])}
-        out['total'] = out[self.task]
+        out['total'] = torch.sum(torch.stack([out[self.task]]))
         return out
 
 

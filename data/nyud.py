@@ -210,7 +210,6 @@ class NYUD_MT(data.Dataset):
 
     def _download(self):
         _fpath = os.path.join(MyPath.db_root_dir(), self.FILE)
-
         if os.path.isfile(_fpath):
             print('Files already downloaded')
             return
