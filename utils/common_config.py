@@ -87,7 +87,7 @@ def get_model(cfg):
         if cfg['model'] == 'baseline':
             from models.models import MultiTaskModel
             heads = torch.nn.ModuleDict({task: get_head(cfg, backbone_channels, task) for task in cfg.TASKS.NAMES})
-            model = MultiTaskModel(backbone, heads, cfg.TASKS.NAMES)
+            model = MultiTaskModel(backbone, dynamic_jscc, heads, cfg.TASKS.NAMES)
 
 
         elif cfg['model'] == 'cross_stitch':

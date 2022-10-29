@@ -9,7 +9,7 @@ import numpy as np
 import json
 import torch
 import scipy.io as sio
-from utils.utils import get_output, mkdir_if_missing
+from utils.utils import get_output, mkdir_if_missing, AverageMeter
 
 
 class PerformanceMeter(object):
@@ -203,12 +203,12 @@ def save_model_predictions(p, val_loader, model):
     save_dirs = {task: os.path.join(p['save_dir'], task) for task in tasks}
     for save_dir in save_dirs.values():
         mkdir_if_missing(save_dir)
-
+    cpp = AverageMeter('CPP', ':.4e')
     for ii, sample in enumerate(val_loader):      
         inputs, meta = sample['image'].cuda(non_blocking=True), sample['meta']
         img_size = (inputs.size(2), inputs.size(3))
         output = model(inputs)
- 
+        cpp.update(output['cpp'])
         for task in p.TASKS.NAMES:
             output_task = get_output(output[task], task).cpu().data.numpy()
             for jj in range(int(inputs.size()[0])):
@@ -220,8 +220,7 @@ def save_model_predictions(p, val_loader, model):
                     sio.savemat(os.path.join(save_dirs[task], fname + '.mat'), {'depth': result})
                 else:
                     imageio.imwrite(os.path.join(save_dirs[task], fname + '.png'), result.astype(np.uint8))
-
-
+    print(f"{cpp.__str__()}")
 def eval_all_results(p):
     """ Evaluate results for every task by reading the predictions from the save dir """
     save_dir = p['save_dir'] 

@@ -4,8 +4,8 @@ setup: multi_task
 # Database
 train_db_name: NYUD
 val_db_name: NYUD
-trBatch: 8
-valBatch: 8
+trBatch: 4
+valBatch: 4
 nworkers: 4
 
 # Optimizer and scheduler
@@ -23,6 +23,37 @@ backbone_kwargs:
    pretrained: True
    dilated: True
 head: deeplab
+
+dynamic_jscc:  
+   gpu_ids: [0]
+   checkpoints_dir: ./Checkpoints
+   input_nc: 3                      # of input image channels: 3 for RGB and 1 for grayscale
+   output_nc: 3                     # of output image channels: 3 for RGB and 1 for grayscale
+   ngf: 512                          # of gen filters in the last conv layer
+   ndf: 512                          # of discrim filters in the first conv layer
+   max_ngf: 2048                     # maximal # of gen filters in the last conv layer
+   norm: batch                      # instance normalization or batch normalization [instance | batch | none]
+   init_type: normal                # network initialization [normal | xavier | kaiming | orthogonal]
+   init_gain: 0.02                  # caling factor for normal, xavier and orthogonal
+   n_downsample: 2                  # number of downsample layers
+   n_blocks: 2                      # number of residual blocks
+   C_channel: 128                    # number of channels of the encoder output
+   G_n: 4                           # number of non-selective groups
+   G_s: 4                           # number of selective groups
+   select: hard                     # using hard or soft mask [hard | soft]
+   SNR_MAX: 20                      # maximum SNR
+   SNR_MIN: 0                       # minimum SNR
+   lambda_reward: 0.0015            # weight for efficiency loss
+   lambda_L2: 1                     # weight for MSE loss
+   batch_size: 2
+   max_dataset_size: float("inf")
+   epoch: latest
+   load_iter: 0
+   isTrain: True
+   lr_joint: 0.0005
+   lr_decay: 0.00005
+   lr_fine: 0.00001
+   temp_init: 5
 
 # Tasks
 task_dictionary:

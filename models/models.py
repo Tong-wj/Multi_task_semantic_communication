@@ -33,14 +33,24 @@ class SingleTaskModel(nn.Module):
 
 class MultiTaskModel(nn.Module):
     """ Multi-task baseline model with shared encoder + task-specific decoders """
-    def __init__(self, backbone: nn.Module, decoders: nn.ModuleDict, tasks: list):
+    def __init__(self, backbone: nn.Module, dynamic_jscc: nn.Module, decoders: nn.ModuleDict, tasks: list):
         super(MultiTaskModel, self).__init__()
         assert(set(decoders.keys()) == set(tasks))
         self.backbone = backbone
+        self.dynamic_jscc = dynamic_jscc
         self.decoders = decoders
         self.tasks = tasks
 
     def forward(self, x):
         out_size = x.size()[2:]
         shared_representation = self.backbone(x)
-        return {task: F.interpolate(self.decoders[task](shared_representation), out_size, mode='bilinear') for task in self.tasks}
+        self.dynamic_jscc.set_input(shared_representation)
+        out_dynamic_jscc = self.dynamic_jscc()
+        if True:
+            loss_dynamic_jscc, cpp = self.dynamic_jscc.backward_G()
+        else:
+            loss_dynamic_jscc, cpp = 0, 0
+        result = {task: F.interpolate(self.decoders[task](shared_representation), out_size, mode='bilinear') for task in self.tasks}
+        result['dynamic_jscc_loss'] = loss_dynamic_jscc
+        result['cpp'] = cpp
+        return result
